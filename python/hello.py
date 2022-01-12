@@ -1,7 +1,11 @@
-myorder = "she wants {0} pieces of item {2} for {1} dollars."
+myset = {"apple", "banana", "cherry", "apple"}
+mylist = ["apple", "banana", "orange"]
+mytuple = ("apple", "banana", "grape")
 
-quantity = 3
-itemno = 4
-price = 10
+mydic = {
+    "brand": "tesla",
+    "model": "tesla 3",
+    "year": 2020
+}
 
-print(myorder.format(quantity, itemno, price).find("pieces"))
+print(mydic.keys())
