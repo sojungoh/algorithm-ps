@@ -1,11 +1,13 @@
-myset = {"apple", "banana", "cherry", "apple"}
-mylist = ["apple", "banana", "orange"]
-mytuple = ("apple", "banana", "grape")
+class User:
+    def __init__(self, name, age, sex):
+        self.name = name
+        self.age = age
+        self.sex = sex
+    
+    def greet(self):
+        print("Nice to meet you " + self.name + "(" + self.age + ")")
 
-mydic = {
-    "brand": "tesla",
-    "model": "tesla 3",
-    "year": 2020
-}
+u1 = User("Bella", "23", "woman")
 
-print(mydic.keys())
+u1.greet()    
+    
