@@ -1,4 +1,3 @@
-x = int(input())
-y = input()
-
-print(x*int(y[2]), x*int(y[1]), x*int(y[0]), x*int(y), sep='\n')
+buddhismYear = int(input())
+year = buddhismYear - 543
+print(year)
