@@ -13,4 +13,4 @@ else:
     if cookedHour >= 24:
         cookedHour %= 24
         
-    print(cookedHour, cookedMinute) 
+    print(cookedHour, cookedMinute)
