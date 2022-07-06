@@ -44,7 +44,6 @@ int main() {
 			iter++;		
 		}
 	}
-
 	cout << count << endl;
 
 	return 0;
