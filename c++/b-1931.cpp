@@ -1,10 +1,9 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define p pair<int, int>
-
 #include <iostream>
 #include <map>
 #include <vector>
 #include <algorithm>
+
+#define p pair<int, int>
 
 using namespace std;
 
