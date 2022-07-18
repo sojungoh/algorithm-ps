@@ -13,30 +13,37 @@ using namespace std;
 // abcabcdede -> 1: abcabcdede / 2: abcabc2de / 3: 2abcdede
 // abcdedeabc -> 2: abc2deabc
 
-// abcabcabcdede -> 3: 3abcdede
+// abcabcabcdedef -> 3: 3abcdede
 
 int solution(string s) {
-	int answer = 0;
-	answer = s.size();
+	int answer = s.size();
 	string repeat;
 
 	for (int i = 1; i <= s.size() / 2; i++) {
 		repeat = s.substr(0, i);
-		int temp = 0, j = i, flag = 0;
+		int temp = 0, j = i, count = 1;
 
 		for (; j <= s.size() - i; j += i) {
 			if (repeat == s.substr(j, i)) {
-				flag = 1;
+				count += 1;
 				continue;
 			}
-			if (flag) temp += i + 1;
+			if (count > 1) {
+				string digit = to_string(count);
+				temp += i + digit.size();
+			}
 			else temp += i;
 
 			repeat = s.substr(j, i);
-			flag = 0;
+			count = 1;
 		}
-		if (flag) temp += i + 1;
-		else temp += i + s.size() - j;
+
+		temp += i + s.size() - j;
+
+		if (count > 1) {
+			string digit = to_string(count);
+			temp += digit.size();
+		}
 
 		answer = min(answer, temp);
 	}
