@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# customizing
+c++/project/
+./vscode/
+
