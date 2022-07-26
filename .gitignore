@@ -33,5 +33,6 @@
 
 # customizing
 c++/project/
-./vscode/
+.vscode/
+c++/.vs/
 
