@@ -9,7 +9,6 @@ vector<vector<pair<int, int>>> route(500);
 vector<vector<pair<int, int>>> map(500);
 int s, d, ans = -1, visited[500], dist[500], min_edge[500][500] = { 0, };
 bool min_flag = false;
-
 int branch = -1;
 
 void dfs(int curr, int sum) {
