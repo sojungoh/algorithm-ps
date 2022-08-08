@@ -6,8 +6,7 @@ int n, m, query[1000001][3], p_team[1000001];
 
 int find_team(int x) {
 	if (p_team[x] != x)
-		p_team[x] = find_team(p_team[x]);
-	
+		p_team[x] = find_team(p_team[x]);	
 	return p_team[x];
 }
 
