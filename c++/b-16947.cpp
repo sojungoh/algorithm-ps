@@ -1,74 +1,62 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <queue>
+#include <cstring>
 
 using namespace std;
 
-vector<vector<bool>> edge_check;
-vector<bool> first_check;
-vector<bool> visit_check;
+int n, ans[3001] = { 0, };
+vector<vector<int>> connect(3001);
 
-int count_dist;
-int is_found;
+int station = 1, visited[3001] = { 0, }, circle = 0;
+bool flag = false;
 
-int find_circle(int n, int curr, int next) {
-	for (int i = 0; i < n; i++) {
-		if (edge_check[next][i] && i != curr) {
-			if (first_check[next])
-				return next;
-
-			first_check[next] = true;
-			return find_circle(n, next, i);
-		}
+void dfs(int before, int curr) {
+	if (visited[curr]) {
+		circle = curr;
+		return;
 	}
-}
 
-void dfs(int n, int v, int goal) {
-	count_dist = 0;
-	is_found = 0;
-	visit_check[v] = true;
+	for (int i = 0; i < connect[curr].size(); i++) {
+		if (connect[curr][i] == before) continue;
 
-	for (int i = 0; i < n; i++) {
-		if (edge_check[v][i] && !visit_check[v]) {
-			if (i == goal) {
-				is_found = 1; 
-				break;
-			}
-			else 
-				dfs(n, i, goal);
-		}
-		if (is_found == 1)
-			count_dist++;
+		visited[curr] = 1;
+		dfs(curr, connect[curr][i]);
+		visited[curr] = 0;
+
+		if (flag) ans[station]++;
+
+		if (circle == curr)
+			flag = true;
+		
+		if(circle != 0)
+			break;
 	}
 }
 
 int main() {
-	int n, s1, s2;
+	ios::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
 
-	scanf("%d", &n);
+	cin >> n;
 
-	edge_check.assign(n,vector<bool>(n, false));
-
+	int from, to;
 	for (int i = 0; i < n; i++) {
-		scanf("%d %d", &s1, &s2);
-		s1 -= 1; s2 -= 1;
-		edge_check[s1][s2] = 1;
-		edge_check[s2][s1] = 1;
+		cin >> from >> to;
+		connect[from].push_back(to);
+		connect[to].push_back(from);
 	}
 
-	for (int station = 0; station < n; station++) {
-		int i = 0;
-		first_check.assign(n, false);
-
-		while (!edge_check[station][i]) i++;
-		first_check[station] = true;
-		int temp = find_circle(n, station, i);
-
-		visit_check.assign(n, 0);
-		dfs(n, temp, station);
-
-		cout << count_dist << " ";
+	for (; station <= n; station++) {
+		dfs(0, station);
+		memset(visited, 0, sizeof(visited));
+		circle = 0;
+		flag = false;
 	}
-	cout << endl;
+
+	for (int i = 1; i <= n; i++)
+		cout << ans[i] << ' ';
+	cout << '\n';
+
 	return 0;
 }
