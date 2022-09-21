@@ -1,41 +1,10 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <algorithm>
 
 using namespace std;
 
-int solve(string a, string b) {
-	vector<int> index;
-
-	for (int i = 0; i < a.size(); i++) {
-		char c = a[i];
-
-		for (int j = 0; j < b.size(); j++) {
-			if (b[j] == c) {
-				int idx = upper_bound(index.begin(), index.end(), j) - index.begin();
-
-				if (idx != 0 && index[idx - 1] == j) continue;
-
-				if (idx == index.size()) {
-					index.push_back(j);
-				}
-				else {
-					if (index[idx] == j) continue;
-					index[idx] = j;
-				}
-
-				break;
-			}
-		}
-	}
-
-	for (int i = 0; i < index.size(); i++)
-		cout << index[i] << ' ';
-	cout << '\n';
-
-	return index.size();
-}
+int dp[1001][1001] = {0, };
 
 int main() {
 	ios::sync_with_stdio(0);
@@ -44,7 +13,22 @@ int main() {
 	string a, b;
 	cin >> a >> b;
 
-	cout << max(solve(a, b), solve(b, a)) << '\n';
+	for (int i = 1; i <= a.size(); i++) {
+		for (int j = 1; j <= b.size(); j++) {
+			if (a[i - 1] == b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+			else dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+		}
+	}
+
+	/*for (int i = 1; i <= a.size(); i++) {
+		for (int j = 1; j <= b.size(); j++) {
+			cout << dp[i][j] << ' ';
+		}
+		cout << '\n';
+	}*/
+
+	cout << dp[a.size()][b.size()] << '\n';
 
 	return 0;
 }
+
