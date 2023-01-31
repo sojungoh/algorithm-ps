@@ -1,50 +1,50 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-typedef pair<int, int> pii;
-
 int dp[151][151];
-map<pii, int> p; // alp_req, cop_req, idx
 
 int solution(int alp, int cop, vector<vector<int>> problems) {
 	int answer = 0;
-	unsigned long p_count = 0;
+	int max_alp = 0, max_cop = 0;
 	
-	// initialization
-	for(int i = 0; i <= 150; ++i) {
-		for(int j = 0; j <= 150; ++j) {
-			if(i == alp && j == cop) dp[i][j] = 0;
+	// find the largest alp and cop
+	for(vector<int> vec : problems) {
+		max_alp = max(max_alp, vec[0]);
+		max_cop = max(max_cop, vec[1]);
+	}
+	
+	// init dp array
+	for(int i = 0; i <= max_alp; ++i) {
+		for(int j = 0; j <= max_cop; ++j) {
+			if(i <= alp && j <= cop) dp[i][j] = 0;
 			else dp[i][j] = 1e9;
 		}
 	}
 	
-	for(unsigned long i = 0; i < problems.size(); ++i) {
-		p.insert({{problems[i][0], problems[i][1]}, i});
-	}
-	
 	// dp
-	for(int i = 0; i <= 150; ++i) {
-		for(int j = 0; j <= 150; ++j) {
+	int alp_req, cop_req, alp_rwd, cop_rwd, cost;
+	
+	for(int i = 0; i <= max_alp; ++i) {
+		for(int j = 0; j <= max_cop; ++j) {
 			
-			if(p.find({i, j}) != p.end()) {
-				int idx = p[{i, j}];
-				int exp_alp = i + problems[idx][2];
-				int exp_cop = j + problems[idx][3];
-				int cost = problems[idx][4];
-				dp[exp_alp][exp_cop] = min(dp[exp_alp][exp_cop], dp[i][j] + cost);
+			if(alp <= i && cop <= j)
+				dp[i][j] = min(dp[i][j], dp[alp][cop] + (i - alp) + (j - cop));
+			
+			for(unsigned long k = 0; k < problems.size(); ++k) {
+				alp_req = problems[k][0];
+				cop_req = problems[k][1];
+				alp_rwd = problems[k][2];
+				cop_rwd = problems[k][3];
+				cost = problems[k][4];
 				
-				++p_count;
-				if(p_count == problems.size()) {
-					answer = dp[exp_alp][exp_cop];
-					break;
-				}
-			}
-			else {
-				if(i < alp || j < cop) continue;
-				else dp[i][j] = min(dp[i][j], dp[i - alp][j - cop] + i - alp + j - cop);
+				if(i < alp_req || j < cop_req) continue;
+				else dp[i + alp_rwd][j + cop_rwd] = min(dp[i + alp_rwd][j + cop_rwd], dp[i][j] + cost);	
 			}
 		}
 	}
+	
+	answer = dp[max_alp][max_cop];
+	
 	return answer;
 }
 
@@ -52,9 +52,17 @@ int main() {
 	ios::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
 	
-	vector<vector<int>> problems = {{10, 15, 2, 1, 2}, {20, 20, 3, 3, 4}};
+	vector<vector<int>> problems = {{0, 0, 2, 1, 2}, {4, 5, 3, 1, 2}, 
+									{4, 11, 4, 0, 2}, {10, 4, 0, 4, 2}};
 	
-	cout << solution(10, 10, problems) << '\n';
+	cout << solution(0, 0, problems) << '\n';
+	
+	for(int i = 0; i <= 10; ++i) {
+		for(int j = 0; j <= 11; ++j) {
+			cout << dp[i][j] << ' ';
+		}
+		cout << '\n';
+	}
 	
 	return 0;
 }
