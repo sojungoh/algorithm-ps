@@ -36,3 +36,8 @@ c++/project/
 .vscode/
 c++/.vs/
 
+# binary file
+*
+!*.*
+!*/
+
