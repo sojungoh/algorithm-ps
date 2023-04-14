@@ -13,7 +13,7 @@ bool checkColumnInstall(int x, int y) {
     if(y == 0) {
         ret_val = true;
     }
-    else if(column.find({x, y - 1}) != girder.end()) {
+    else if(column.find({x, y - 1}) != column.end()) {
         ret_val = true;
     }       
     else if(girder.find({x, y}) != girder.end() 
