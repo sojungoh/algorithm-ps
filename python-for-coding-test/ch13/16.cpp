@@ -10,7 +10,6 @@ int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
 vector<pair<int, int>> empty_coord, virus_coord;
 
 int get_safe_size(vector<pair<int, int>> tmp_wall) {
-	
 	int tmp_map[n][m], ret_val = 0;
 	queue<pair<int, int>> q;
 	
@@ -28,7 +27,6 @@ int get_safe_size(vector<pair<int, int>> tmp_wall) {
 		q.push({p.first, p.second});
 	
 	while(!q.empty()) {
-		
 		int x = q.front().first;
 		int y = q.front().second;
 		
@@ -58,7 +56,6 @@ int get_safe_size(vector<pair<int, int>> tmp_wall) {
 }
 
 void solve() {
-	
 	int answer = 0;
 	vector<int> index;
 	size_t sz = empty_coord.size();
@@ -69,7 +66,6 @@ void solve() {
 		index.push_back(1);
 	
 	do {
-		
 		vector<pair<int, int>> tmp_wall;
 		
 		for(size_t i = 0; i < sz; ++i)
