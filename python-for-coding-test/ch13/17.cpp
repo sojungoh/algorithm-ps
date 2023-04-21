@@ -1,32 +1,33 @@
 #include <iostream>
 #include <queue>
+#include <tuple>
 
 using namespace std;
 
 int n, k, s, x, y, map[201][201];
 int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
-queue<pair<int, int>> q;
+priority_queue<tuple<int, int, int>> pq;
 
 void solve() {
 	
 	int time = 0;
 	
-	while(!q.empty()) {
+	while(!pq.empty()) {
 		
 		bool flag = false;
-		size_t sz = q.size();
+		size_t sz = pq.size();
+		priority_queue<tuple<int, int, int>> tmp;
 		
 		if(time == s)
 			break;
+		
+		for(size_t t = 0; t < sz; ++t) {
 			
-		// must be sorted
+			int virus = -get<0>(pq.top());
+			int a = get<1>(pq.top());
+			int b = get<2>(pq.top());
 		
-		for(int t = 0; t < sz; ++t) {
-		
-			int a = q.front().first;
-			int b = q.front().second;
-		
-			q.pop();
+			pq.pop();
 			
 			if(a == x && b == y) {
 				flag = true;
@@ -43,15 +44,17 @@ void solve() {
 				if(map[nx][ny] != 0)
 					continue;
 				
-				map[nx][ny] = map[a][b];
+				map[nx][ny] = virus;
 				
-				q.push({nx, ny});
+				tmp.push({-virus, nx, ny});
 			}
 		}
 		
 		if(flag) break;
 		
 		time += 1;
+		
+		pq = tmp;
 	}
 	
 	cout << map[x][y] << endl;
@@ -68,7 +71,7 @@ int main() {
 			cin >> map[i][j];
 			
 			if(map[i][j] != 0)
-				q.push({i, j});
+				pq.push({-map[i][j], i, j});
 		}
 	}
 	
