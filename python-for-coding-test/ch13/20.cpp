@@ -14,11 +14,11 @@ bool simulate() {
 	for(pair<int, int> p : o_coord)
 		map[p.first][p.second] = 'O';
 	
-	for(pair<int, int> p : t_coord) {
-		int nx = p.first;
-		int ny = p.second;
-		
+	for(pair<int, int> p : t_coord) {	
 		for(int i = 0; i < 4; ++i) {
+			int nx = p.first;
+			int ny = p.second;
+			
 			while(true) {
 				nx += dx[i];
 				ny += dy[i];
@@ -26,7 +26,7 @@ bool simulate() {
 				if(nx < 1 || ny < 1 || nx > n || ny > n)
 					break;
 				
-				if(map[nx][ny] != 'X')
+				if(map[nx][ny] == 'O')
 					break;
 				
 				if(map[nx][ny] == 'S') {
@@ -61,10 +61,13 @@ bool solve(int x, int y) {
 			if(visited[i][j])
 				continue;
 			
+			if(map[i][j] != 'X')
+				continue;
+			
 			visited[i][j] = 1;
 			o_coord.push_back({i, j});
 			
-			bool flag = solve(i + 1, j + 1);
+			bool flag = solve(i, j + 1);
 			
 			if(!flag)
 				return flag;
@@ -72,6 +75,7 @@ bool solve(int x, int y) {
 			visited[i][j] = 0;
 			o_coord.pop_back();
 		}
+		y = 1;
 	}
 	
 	return true;
@@ -91,7 +95,7 @@ int main() {
 		}
 	}
 	
-	bool flag = solve(0, 0);
+	bool flag = solve(1, 1);
 	
 	if(flag)
 		cout << "NO" << endl;
