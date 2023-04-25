@@ -9,9 +9,10 @@ int N, L, R, map[50][50], visited[50][50];
 int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
 
 bool bfs(int a, int b) {
-	int uni_sum = 0, uni_count = 0;
+	
 	queue<pair<int, int>> q;
 	vector<pair<int, int>> uni;
+	int uni_sum = 0, uni_count = 0;
 	
 	q.push({a, b});
 	visited[a][b] = 1;
@@ -44,32 +45,42 @@ bool bfs(int a, int b) {
 			}
 		}
 	}
+		
+	if(uni_count == 1)
+		return false;
 	
 	for(pair<int, int> p : uni)
 		map[p.first][p.second] = uni_sum / uni_count;
-	
-	if(uni_count == 1)
-		return false;
+		
 	return true;
 }
 
 void solve() {
-	
 	int ans = 0;
+	bool flag;
 	
-	for(int i = 0; i < N; ++i) {
-		for(int j = 0; j < N; ++j) {
-			if(visited[i][j])
-				continue;
-			
-			for(int m = 0; m < N; ++m)
-				for(int n = 0; n < N; ++n)
-					visited[m][n] = 0;
-			
-			if(bfs(i, j))
-				ans += 1;
+	do {
+		
+		flag = false;
+		
+		for(int i = 0; i < N; ++i)
+			for(int j = 0; j < N; ++j)
+				visited[i][j] = 0;
+		
+		for(int i = 0; i < N; ++i) {
+			for(int j = 0; j < N; ++j) {
+				if(visited[i][j])
+					continue;
+				
+				if(bfs(i, j))
+					flag = true;
+			}
 		}
-	}
+		
+		if(flag)
+			ans += 1;
+					
+	}while(flag);
 	
 	cout << ans << endl;
 }
