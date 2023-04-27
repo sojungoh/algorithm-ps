@@ -2,10 +2,11 @@
 #include <vector>
 #include <queue>
 #include <set>
+#include <iostream>
 
 using namespace std;
 
-set<int> visited;
+set<long long> visited;
 int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
 
 int solution(vector<vector<int>> board) {
@@ -26,7 +27,8 @@ int solution(vector<vector<int>> board) {
     v.push_back(time);
     
     q.push(v);
-    visited.insert(11102);
+    visited.insert(1001001002);
+    visited.insert(1002001001);
     
     while(!q.empty()) {
         int sx = q.front()[0];
@@ -37,6 +39,8 @@ int solution(vector<vector<int>> board) {
         time = q.front()[5];
         
         q.pop();
+        
+        cout << sx << ' ' << sy << ' ' << ex << ' ' << ey << ' ' << row_flag << ' ' << time << endl;
         
         if((sx == N && sy == N) || (ex == N && ey == N)) {
             answer = time;
@@ -58,10 +62,13 @@ int solution(vector<vector<int>> board) {
             if(board[move_sx - 1][move_sy - 1] || board[move_ex - 1][move_ey - 1])
                 continue;
             
-            if(visited.find(move_sx * 10000 + move_sy * 1000 + move_ex * 100 + move_ey) != visited.end())
+            if(visited.find(move_sx * 1000000000 + move_sy * 1000000 + move_ex * 1000 + move_ey) != visited.end())
+                continue;
+            if(visited.find(move_ex * 1000000000 + move_ey * 1000000 + move_sx * 1000 + move_sy) != visited.end())
                 continue;
             
-            visited.insert(move_sx * 10000 + move_sy * 1000 + move_ex * 100 + move_ey);
+            visited.insert(move_sx * 1000000000 + move_sy * 1000000 + move_ex * 1000 + move_ey);
+            visited.insert(move_ex * 1000000000 + move_ey * 1000000 + move_sx * 1000 + move_sy);
             
             vector<int> info;
             info.push_back(move_sx);
@@ -128,10 +135,13 @@ int solution(vector<vector<int>> board) {
             if(board[rotate_ex - 1][rotate_ey - 1] || board[rotate_wx - 1][rotate_wy - 1])
                 continue;
             
-            if(visited.find(rotate_sx * 10000 + rotate_sy * 1000 + rotate_ex * 100 + rotate_ey) != visited.end())
+            if(visited.find(rotate_sx * 1000000000 + rotate_sy * 1000000 + rotate_ex * 1000 + rotate_ey) != visited.end())
                 continue;
+            if(visited.find(rotate_ex * 1000000000 + rotate_ey * 1000000 + rotate_sx * 1000 + rotate_sy) != visited.end())
+            continue;
             
-            visited.insert(rotate_sx * 10000 + rotate_sy * 1000 + rotate_ex * 100 + rotate_ey);
+            visited.insert(rotate_sx * 1000000000 + rotate_sy * 1000000 + rotate_ex * 1000 + rotate_ey);
+            visited.insert(rotate_ex * 1000000000 + rotate_ey * 1000000 + rotate_sx * 1000 + rotate_sy);
             
             vector<int> info;
             info.push_back(rotate_sx);
@@ -139,8 +149,8 @@ int solution(vector<vector<int>> board) {
             info.push_back(rotate_ex);
             info.push_back(rotate_ey);
             
-            row_flag = (row_flag == 1) ? 0 : 1; 
-            info.push_back(row_flag);
+            int temp = (row_flag == 1) ? 0 : 1;
+            info.push_back(temp);
             info.push_back(time + 1);
             
             q.push(info);
@@ -151,3 +161,13 @@ int solution(vector<vector<int>> board) {
     return answer;
 }
 
+int main() {
+	ios::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+	
+	vector<vector<int>> board = {{0, 0, 0, 0, 0, 0, 1}, {1, 1, 1, 1, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0}, {0, 0, 1, 1, 1, 1, 0}, {0, 1, 1, 1, 1, 1, 0}, {0, 0, 0, 0, 0, 1, 1}, {0, 0, 1, 0, 0, 0, 0}};
+	
+	cout << solution(board) << endl;
+	
+	return 0;
+}
