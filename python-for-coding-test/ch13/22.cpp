@@ -13,8 +13,6 @@ int solution(vector<vector<int>> board) {
     int answer = 0;
     
     int N = board.size();
-    int time = 0;
-    int row_flag = 1;
     int robot_coord[2][2] = {{1, 1}, {1, 2}};
     
     vector<int> v;
@@ -23,8 +21,8 @@ int solution(vector<vector<int>> board) {
     for(int i = 0; i < 2; ++i)
         for(int j = 0; j < 2; ++j)
             v.push_back(robot_coord[i][j]);
-    v.push_back(row_flag);
-    v.push_back(time);
+    v.push_back(1);
+    v.push_back(0);
     
     q.push(v);
     visited.insert(1001001002);
@@ -35,12 +33,12 @@ int solution(vector<vector<int>> board) {
         int sy = q.front()[1];
         int ex = q.front()[2];
         int ey = q.front()[3];
-        row_flag = q.front()[4];
-        time = q.front()[5];
+        int row_flag = q.front()[4];
+        int time = q.front()[5];
         
         q.pop();
         
-        cout << sx << ' ' << sy << ' ' << ex << ' ' << ey << ' ' << row_flag << ' ' << time << endl;
+        //cout << sx << ' ' << sy << ' ' << ex << ' ' << ey << ' ' << row_flag << ' ' << time << endl;
         
         if((sx == N && sy == N) || (ex == N && ey == N)) {
             answer = time;
@@ -161,13 +159,3 @@ int solution(vector<vector<int>> board) {
     return answer;
 }
 
-int main() {
-	ios::sync_with_stdio(0);
-	cin.tie(0); cout.tie(0);
-	
-	vector<vector<int>> board = {{0, 0, 0, 0, 0, 0, 1}, {1, 1, 1, 1, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0}, {0, 0, 1, 1, 1, 1, 0}, {0, 1, 1, 1, 1, 1, 0}, {0, 0, 0, 0, 0, 1, 1}, {0, 0, 1, 0, 0, 0, 0}};
-	
-	cout << solution(board) << endl;
-	
-	return 0;
-}
