@@ -8,7 +8,9 @@ int n, m, map[1000][1000];
 int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
 vector<pair<int, int>> tomato_coord;
 
-void bfs() {
+int bfs() {
+	
+	int day = -1;
 	
 	queue<pair<int, int>> q;
 	
@@ -27,8 +29,8 @@ void bfs() {
 			q.pop();
 		
 			for(int d = 0; d < 4; ++d) {
-				int nx = x + dx[i];
-				int ny = y + dy[i];
+				int nx = x + dx[d];
+				int ny = y + dy[d];
 			
 				if(nx < 0 || ny < 0 || nx >= n || ny >= m)
 					continue;
@@ -41,28 +43,37 @@ void bfs() {
 				q.push({nx, ny});
 			}
 		}
+		
+		day += 1;
 	}
+	
+	return day;
 }
 
-int solve() {
+void solve() {
 	
-	if(tomato_coord.size() == 0)
-		return -1;
-	if(tomato_coord.size() == n * m)
-		return 0;
+	int ans = bfs();
 	
-	bfs();
+	for(int i = 0; i < n; ++i) {
+		for(int j = 0; j < m; ++j) {
+			if(map[i][j] == 0) {
+				ans = -1;
+				break;
+			}
+		}
+	}
 	
+	cout << ans << endl;
 }
 
 int main() {
 	ios::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
 	
-	cin >> n >> m;
+	cin >> m >> n;
 	
 	for(int i = 0; i < n; ++i) {
-		for(int j = 0; j < n; ++j) {
+		for(int j = 0; j < m; ++j) {
 			cin >> map[i][j];;
 			
 			if(map[i][j] == 1)
@@ -70,7 +81,7 @@ int main() {
 		}
 	}
 	
-	cout << solve() << endl;
+	solve();
 	
 	return 0;
 }
