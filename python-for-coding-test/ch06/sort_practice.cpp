@@ -46,6 +46,37 @@ void insertion_sort(vector<int> origin) {
 	cout << endl;
 }
 
+void quick_sort(vector<int> v, int p, int r) {
+	
+	if(v.size() == 1)
+		return;
+	
+	int pivot = v[p];
+	int left = p + 1;
+	int right = r;
+	
+	while(left <= right) {
+		
+		while(left != r + 1 && v[left] <= pivot)
+			left++;
+		while(right != p && v[right] >= pivot)
+			right--;
+		
+		if(left > right)
+			break;
+			
+		int temp = v[left];
+		v[left] = v[right];
+		v[right] = temp;
+	}
+	
+	v[p] = v[right];
+	v[right] = pivot;
+	
+	quick_sort(v, p, right - 1);
+	quick_sort(v, right + 1, r);
+}
+
 int main() {
 	ios::sync_with_stdio(0);
 	cin.tie(0); cout.tie(0);
@@ -54,6 +85,11 @@ int main() {
 	
 	selection_sort(vec);
 	insertion_sort(vec);
+	quick_sort(vec, 0, vec.size() - 1);
+	
+	for(int num : vec)
+		cout << num << ' ';
+	cout << endl;
 	
 	return 0;
 }
