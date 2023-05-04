@@ -46,9 +46,9 @@ void insertion_sort(vector<int> origin) {
 	cout << endl;
 }
 
-void quick_sort(vector<int> v, int p, int r) {
+void quick_sort(vector<int>& v, int p, int r) {
 	
-	if(v.size() == 1)
+	if(p >= r)
 		return;
 	
 	int pivot = v[p];
