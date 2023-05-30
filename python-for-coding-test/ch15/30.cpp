@@ -1,71 +1,110 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 
 using namespace std;
 
-int match = 0;
+int first_idx, last_idx;
+vector<vector<string>> words_by_length(10001);
+vector<vector<string>> reverse_words_by_length(10001);
+bool is_vec_sorted[10001][2] = {0, };
+unordered_map<string, int> query_table;
 
-void binary_search(vector<pair<string, int>>& words, string query, int length, int start, int end) {
+string reverse_word(string word) {
+    string rword = "";
+    
+    for(int i = word.length() - 1; i >= 0; --i)
+        rword += word[i];
+    
+    return rword;
+}
+
+void binary_search(vector<string>& vec, string query, int start, int end) {
     if(start > end)
         return;
     
     int mid = (start + end) / 2;
+    string s = vec[mid].substr(0, query.length());
     
-    if(words[mid].first.compare(query) == 0) {
-        if(words[mid].second == length)
-            match += 1;
-        binary_search(words, query, length, mid + 1, end);
-        binary_search(words, query, length, start, mid - 1);   
+    if(s.compare(query) == 0) {
+        first_idx = min(first_idx, mid);
+        last_idx = max(last_idx, mid);
     }
-    else if(words[mid].first.compare(query) < 0) {
-        binary_search(words, query, length, mid + 1, end);
-    }
-    else {
-        binary_search(words, query, length, start, mid - 1);
-    }
+    
+    if(s.compare(query) <= 0)
+        binary_search(vec, query, mid + 1, end);
+    if(s.compare(query) >= 0)
+        binary_search(vec, query, start, mid - 1);
 }
 
 vector<int> solution(vector<string> words, vector<string> queries) {
     vector<int> answer;
-    size_t n = words.size() - 1;
+    
+    for(string word : words) {
+        words_by_length[word.length()].push_back(word);
+        string rword = reverse_word(word);
+        reverse_words_by_length[word.length()].push_back(rword);
+    }
     
     for(string query : queries) {
+        // 효율성 1번 테스트  - 검색어 중복 시간초과 방지
+        if(query_table.find(query) != query_table.end()) {
+            answer.push_back(query_table[query]);
+            continue;
+        }
+        
         size_t l = query.length();
-        int start_idx = l, end_idx = -1;
+        
+        first_idx = l;
+        last_idx = -1;
         
         for(int i = 0; i < l; ++i) {
             if(query[i] != '?') {
-                start_idx = min(start_idx, i);
-                end_idx = max(end_idx, i);
+                first_idx = min(first_idx, i);
+                last_idx = max(last_idx, i);
             }
         }
-        
-        match = 0;
-        
-        if(start_idx == l && end_idx == -1) {
-			for(string word: words) {
-				if(word.length() == l)
-					match += 1;
-			}
-			answer.push_back(match);
-			continue;
-		}
-        
-        vector<pair<string, int>> sub_words;
-        
-        for(string word : words) {
-            if(start_idx < word.length() && end_idx < word.length()) {
-                string s = word.substr(start_idx, end_idx + 1);
-                sub_words.push_back({s, word.length()});   
-            }
+        // 검색 키워드 전체가 물음표일 시 바로 리턴
+        if(first_idx == l && last_idx == -1) {
+            answer.push_back(words_by_length[l].size());
+            continue;
         }
         
-        sort(sub_words.begin(), sub_words.end());
+        bool first = (first_idx == 0) ? true : false; // 접두사, 접미사 체크
+	// 물음표를 제외한 검색 키워드 추출
+        string sub_query = query.substr(first_idx, last_idx - first_idx + 1);
+        string reverse_sub_query = reverse_word(sub_query);
         
-        binary_search(sub_words, query.substr(start_idx, end_idx + 1), l, 0, sub_words.size() - 1);
+        first_idx = 100001;
+        last_idx = -1;
         
-        answer.push_back(match);
+        if(first) {
+	    // 중복 sort 방지
+            if(!is_vec_sorted[l][0]) {
+                sort(words_by_length[l].begin(), words_by_length[l].end());
+                is_vec_sorted[l][0] = 1;
+            }
+            
+            binary_search(words_by_length[l], sub_query, 0, words_by_length[l].size() - 1);
+        }
+        else {
+            if(!is_vec_sorted[l][1]) {
+                sort(reverse_words_by_length[l].begin(), reverse_words_by_length[l].end());
+                is_vec_sorted[l][1] = 1;
+            }
+            binary_search(reverse_words_by_length[l], reverse_sub_query, 0, reverse_words_by_length[l].size() - 1);
+        }
+        
+        int val;
+        
+        if(last_idx < first_idx)
+            val = 0;
+        else
+            val = last_idx - first_idx + 1;
+        
+        query_table.insert({query, val});
+        answer.push_back(val);
     }
     
     return answer;
