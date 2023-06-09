@@ -5,7 +5,8 @@
 
 using namespace std;
 
-int *dist, **graph;
+int *dist;
+vector<vector<pair<int, int>>> graph(20001);
 
 void solve(int v, int k) {
 	
@@ -18,15 +19,12 @@ void solve(int v, int k) {
 		int curr = pq.top().second;
 		pq.pop();
 		
-		for(int i = 1; i <= v; ++i) {
-			if(graph[curr][i] == int(1e9))
+		for(pair<int, int> p : graph[curr]) {
+			if(dist[p.first] <= dist[curr] + p.second)
 				continue;
 			
-			if(dist[i] <= dist[curr] + graph[curr][i])
-				continue;
-			
-			dist[i] = dist[curr] + graph[curr][i];
-			pq.push({-dist[i], i});
+			dist[p.first] = dist[curr] + p.second;
+			pq.push({-dist[p.first], p.first});
 		}
 	}
 	
@@ -45,18 +43,15 @@ int main() {
 	int v, e, k, u, x, w;
 	cin >> v >> e >> k;
 	
+	graph.resize(v + 1);
+	
 	dist = new int[v + 1];
 	fill(dist, dist + v + 1, int(1e9));
 	dist[k] = 0;
 	
-	graph = new int*[v + 1];
-	for(int i = 0; i <= v; ++i)
-		graph[i] = new int[v + 1];
-	fill(&graph[0][0], &graph[v][v + 1], int(1e9));
-
 	for(int i = 0; i < e; ++i) {
 		cin >> u >> x >> w;
-		graph[u][x] = min(graph[u][x], w);
+		graph[u].push_back({x, w});
 	}
 	
 	solve(v, k);
