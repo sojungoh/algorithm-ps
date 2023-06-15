@@ -5,7 +5,42 @@
 
 using namespace std;
 
-void topology_sort(int n, bool **graph, int *indegree) {
+void solve() {
+	int n;
+	cin >> n;
+	
+	int rank[n];
+	int indegree[n + 1] = {0, };
+	bool graph[n + 1][n + 1] = {0, };
+    
+	for(int i = 0; i < n; ++i)
+		cin >> rank[i];
+	
+	for(int i = 0; i < n; ++i) {
+		for(int j = i + 1; j < n; ++j) {
+			indegree[rank[j]] += 1;
+			graph[rank[i]][rank[j]] = 1;
+		}
+	}
+	
+	int m, a, b;
+	cin >> m;
+	for(int i = 0; i < m; ++i) {
+		cin >> a >> b;
+		
+		if(graph[a][b]) {	
+			indegree[a] += 1;
+			indegree[b] -= 1;
+			graph[a][b] = 0;
+			graph[b][a] = 1;
+		}
+		else if(graph[b][a]) {
+			indegree[a] -= 1;
+			indegree[b] += 1;
+			graph[a][b] = 1;
+			graph[b][a] = 0;
+		}		
+	}
 	
 	queue<int> q;
 	vector<int> ans;
@@ -39,51 +74,9 @@ void topology_sort(int n, bool **graph, int *indegree) {
 		return;
 	}
 	
-	for(int a : ans)
-		cout << a << ' ';
+	for(int out : ans)
+		cout << out << ' ';
 	cout << '\n';
-}
-
-void solve() {
-	int n;
-	cin >> n;
-	
-	int rank[n];
-	int indegree[n + 1] = {0, };
-	bool **graph = new bool*[n + 1];
-	for(int i = 0; i <= n; ++i)
-		graph[i] = new bool[n + 1];
-	fill(&graph[0][0], &graph[n][n + 1], false);
-	
-	for(int i = 0; i < n; ++i) {
-		cin >> rank[i];
-		
-		for(int j = 0; j < i; ++j) {
-			indegree[rank[j]] += 1;
-			graph[rank[i]][rank[j]] = true;
-		}
-	}
-	
-	int m, a, b;
-	cin >> m;
-	for(int i = 0; i < m; ++i) {
-		cin >> a >> b;
-		
-		if(graph[a][b]) {	
-			indegree[a] += 1;
-			indegree[b] -= 1;
-			graph[a][b] = false;
-			graph[b][a] = true;
-		}
-		if(graph[b][a]) {
-			indegree[a] -= 1;
-			indegree[b] += 1;
-			graph[a][b] = true;
-			graph[b][a] = false;
-		}		
-	}
-	
-	topology_sort(n, graph, indegree);
 }
 
 int main() {
