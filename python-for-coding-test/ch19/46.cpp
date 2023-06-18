@@ -6,37 +6,25 @@ using namespace std;
 
 int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
 
-struct Info {
+struct Shark {
 	int x;
 	int y;
 	int time;
 	int fish;
 	int length;
 	
-	Info(int _x, int _y, int _time, int _fish, int _length) :
+	Shark(int _x, int _y, int _time, int _fish, int _length) :
 		x(_x), y(_y), time(_time), fish(_fish), length(_length)
 	{};
 };
 
-struct compare {
-	bool operator() (const Info& a, const Info& b) {
-		if(a.time == b.time) {
-			if(a.x == b.x)
-				return a.y > b.y;
-			return a.x > b.x;
-		}
-		return a.time > b.time;
-	}
-};
-
 int main() {
 	ios::sync_with_stdio(0);
-	cin.tie(0);
 	
 	int n;	
 	cin >> n;
 	
-	int arr[n][n];
+	int arr[20][20];
 	
 	int a, b;	
 	for(int i = 0; i < n; ++i) {
@@ -51,20 +39,26 @@ int main() {
 		}
 	}
 	
-	Info sinfo(a, b, 0, 0, 2);
+	Shark shark(a, b, 0, 0, 2);
 	
-	while(true) {	
-		bool visited[n][n] = {0, };
-		priority_queue<Info, vector<Info>, compare> pq;
-		pq.push(Info(sinfo.x, sinfo.y, sinfo.time, sinfo.fish, sinfo.length));
-		visited[sinfo.x][sinfo.y] = 1;
+	while(true) {
+		int visited[20][20] = {0, };
+		queue<Shark> q;
+		q.push(Shark(shark.x, shark.y, shark.time, shark.fish, shark.length));
+		visited[shark.x][shark.y] = 1;
 		
-		while(!pq.empty()) {
-			int x = pq.top().x;
-			int y = pq.top().y;
-			int t = pq.top().time;
+		int min_time = 0;
+		bool flag = false;
+		
+		while(!q.empty()) {
+			int x = q.front().x;
+			int y = q.front().y;
+			int t = q.front().time;
 			
-			pq.pop();
+			q.pop();
+			
+			if(t > min_time)
+				break;
 			
 			for(int i = 0; i < 4; ++i) {
 				int nx = x + dx[i];
@@ -73,33 +67,36 @@ int main() {
 				if(nx < 0 || ny < 0 || nx >= n || ny >= n)
 					continue;
 				
-				if(visited[nx][ny] || arr[nx][ny] > sinfo.length)
+				if(visited[nx][ny] || arr[nx][ny] > shark.length)
 					continue;
 				
-				if(0 < arr[nx][ny] && arr[nx][ny] < sinfo.length) {
-					sinfo.x = nx;
-					sinfo.y = ny;
-					sinfo.time = t + 1;
-					sinfo.fish += 1;
+				if(0 < arr[nx][ny] && arr[nx][ny] < shark.length) {
+					shark.x = nx;
+					shark.y = ny;
+					shark.time = t + 1;
+					min_time = t + 1;
+					shark.fish += 1;
 					arr[nx][ny] = 0;
-					break;
+					flag = true;
+					
+					if(shark.fish == shark.length) {
+						shark.fish = 0;
+						shark.length += 1;
+					}
 				}
 				
 				visited[nx][ny] = 1;
-				pq.push(Info(nx, ny, t + 1, sinfo.fish, sinfo.length)); 
+				q.push(Shark(nx, ny, t + 1, shark.fish, shark.length)); 
 			}
+			
+			
 		}
 		
-		if(sinfo.fish == sinfo.length) {
-			sinfo.fish = 0;
-			sinfo.length += 1;
-		}
-		
-		if(pq.empty())
+		if(!flag && q.empty())
 			break;
 	}
 	
-	cout << sinfo.time << '\n';
+	cout << shark.time << '\n';
 	
 	return 0;
 }
