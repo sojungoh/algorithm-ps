@@ -27,7 +27,7 @@ int main() {
 	
 	int arr[20][20];
 	
-	int a, b;	
+	int a, b;
 	for(int i = 0; i < n; ++i) {
 		for(int j = 0; j < n; ++j) {
 			cin >> arr[i][j];
@@ -44,6 +44,7 @@ int main() {
 	while(true) {
 		int visited[20][20] = {0, };
 		queue<Shark> q;
+		
 		q.push(Shark(shark.x, shark.y, shark.time, shark.fish, shark.length));
 		arr[shark.x][shark.y] = 0;
 		visited[shark.x][shark.y] = 1;
@@ -60,10 +61,8 @@ int main() {
 			
 			q.pop();
 			
-			if(flag && temp.time < t) {
-				shark = temp;
+			if(temp.time < t)
 				break;
-			}
 			
 			for(int i = 0; i < 4; ++i) {
 				int nx = x + dx[i];
@@ -77,46 +76,45 @@ int main() {
 						
 				visited[nx][ny] = 1;
 				
-				if(0 < arr[nx][ny] && arr[nx][ny] < l) {
-					flag = true;
-					
+				if(0 < arr[nx][ny] && arr[nx][ny] < l) {	
+					if(temp.time < t + 1)
+						continue;
+						
 					if(temp.x < nx)
 						continue;
 					
 					if(temp.x == nx && temp.y < ny)
 						continue;
 					
+					flag = true;
+					
 					temp.x = nx;
 					temp.y = ny;
 					temp.time = t + 1;
-					f++;
-					temp.fish = f;
 					
-					if(temp.fish == l) {
-						f = 0;
-						temp.fish = f;
-						l++;
-						temp.length = l;
+					if(f + 1 == l) {
+						temp.fish = 0;
+						temp.length = l + 1;
+						q.push(Shark(nx, ny, t + 1, 0, l + 1));
 					}
+					else {
+						temp.fish = f + 1;
+						temp.length = l;
+						q.push(Shark(nx, ny, t + 1, f + 1, l));
+					}
+					
+					continue;
 				}
 				
-				q.push(Shark(nx, ny, t + 1, f, l)); 
+				q.push(Shark(nx, ny, t + 1, f, l));
 			}
-			
-			if(flag)
-				break;
-		}
-		
-		cout << '\n';
-		for(int i = 0; i < n; ++i) {
-			for(int j = 0; j < n; ++j) {
-				cout << arr[i][j] << ' ';
-			}
-			cout << '\n';
 		}
 		
 		if(!flag)
 			break;
+		
+		shark = temp;
+		arr[shark.x][shark.y] = 0;
 	}
 	
 	cout << shark.time << '\n';
