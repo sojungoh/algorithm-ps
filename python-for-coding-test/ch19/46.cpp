@@ -20,6 +20,7 @@ struct Shark {
 
 int main() {
 	ios::sync_with_stdio(0);
+	cin.tie(0);
 	
 	int n;	
 	cin >> n;
@@ -34,7 +35,6 @@ int main() {
 			if(arr[i][j] == 9) {
 				a = i;
 				b = j;
-				arr[i][j] = 0;
 			}
 		}
 	}
@@ -45,20 +45,25 @@ int main() {
 		int visited[20][20] = {0, };
 		queue<Shark> q;
 		q.push(Shark(shark.x, shark.y, shark.time, shark.fish, shark.length));
+		arr[shark.x][shark.y] = 0;
 		visited[shark.x][shark.y] = 1;
 		
-		int min_time = 0;
 		bool flag = false;
+		Shark temp(n, n, int(1e9), shark.fish, shark.length);
 		
 		while(!q.empty()) {
 			int x = q.front().x;
 			int y = q.front().y;
 			int t = q.front().time;
+			int f = q.front().fish;
+			int l = q.front().length;
 			
 			q.pop();
 			
-			if(t > min_time)
+			if(flag && temp.time < t) {
+				shark = temp;
 				break;
+			}
 			
 			for(int i = 0; i < 4; ++i) {
 				int nx = x + dx[i];
@@ -67,32 +72,50 @@ int main() {
 				if(nx < 0 || ny < 0 || nx >= n || ny >= n)
 					continue;
 				
-				if(visited[nx][ny] || arr[nx][ny] > shark.length)
+				if(visited[nx][ny] || arr[nx][ny] > l)
 					continue;
+						
+				visited[nx][ny] = 1;
 				
-				if(0 < arr[nx][ny] && arr[nx][ny] < shark.length) {
-					shark.x = nx;
-					shark.y = ny;
-					shark.time = t + 1;
-					min_time = t + 1;
-					shark.fish += 1;
-					arr[nx][ny] = 0;
+				if(0 < arr[nx][ny] && arr[nx][ny] < l) {
 					flag = true;
 					
-					if(shark.fish == shark.length) {
-						shark.fish = 0;
-						shark.length += 1;
+					if(temp.x < nx)
+						continue;
+					
+					if(temp.x == nx && temp.y < ny)
+						continue;
+					
+					temp.x = nx;
+					temp.y = ny;
+					temp.time = t + 1;
+					f++;
+					temp.fish = f;
+					
+					if(temp.fish == l) {
+						f = 0;
+						temp.fish = f;
+						l++;
+						temp.length = l;
 					}
 				}
 				
-				visited[nx][ny] = 1;
-				q.push(Shark(nx, ny, t + 1, shark.fish, shark.length)); 
+				q.push(Shark(nx, ny, t + 1, f, l)); 
 			}
 			
-			
+			if(flag)
+				break;
 		}
 		
-		if(!flag && q.empty())
+		cout << '\n';
+		for(int i = 0; i < n; ++i) {
+			for(int j = 0; j < n; ++j) {
+				cout << arr[i][j] << ' ';
+			}
+			cout << '\n';
+		}
+		
+		if(!flag)
 			break;
 	}
 	
