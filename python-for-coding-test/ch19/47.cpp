@@ -11,30 +11,35 @@ struct Info {
 	int y;
 	int num;
 	int dir;
+	int order;
 	
-	Info(int _x, int _y, int _num, int _dir):
-		x(_x), y(_y), num(_num), dir(_dir)
+	Info(int _x, int _y, int _num, int _dir, int _order):
+		x(_x), y(_y), num(_num), dir(_dir), order(_order)
 	{};
 };
 
 struct Compare {
 	bool operator()(const Info& a, const Info& b) {
+		if(a.num == b.num)
+			return a.order < b.order;
 		return a.num > b.num;
 	}
 };
 
 void move_fish(int (*arr)[4][2]) {
 	priority_queue<Info, vector<Info>, Compare> pq;
+	bool visited[17] = {0, };
 	
 	for(int i = 0; i < 4; ++i) {
 		for(int j = 0; j < 4; ++j) {
 			if(arr[i][j][0] <= 0)
 				continue;
 				
-			pq.push(Info(i, j, arr[i][j][0], arr[i][j][1]));
+			pq.push(Info(i, j, arr[i][j][0], arr[i][j][1], 0));
 		}
 	}
 	
+	int count = 1;
 	while(!pq.empty()) {
 		int x = pq.top().x;
 		int y = pq.top().y;
@@ -43,6 +48,11 @@ void move_fish(int (*arr)[4][2]) {
 		
 		pq.pop();
 		
+		if(visited[n])
+			continue;
+		
+		visited[n] = 1;
+		
 		for(int i = 0; i < 8; ++i) {
 			int nx = x + dx[(d + i) % 8];
 			int ny = y + dy[(d + i) % 8];
@@ -50,12 +60,13 @@ void move_fish(int (*arr)[4][2]) {
 			if(nx < 0 || ny < 0 || nx >= 4 || ny >= 4)
 				continue;
 			
-			// shark is here
 			if(arr[nx][ny][0] == 0)
 				continue;
 			
+			pq.push(Info(x, y, arr[nx][ny][0], arr[nx][ny][1], count++));
+			
 			arr[x][y][0] = arr[nx][ny][0];
-			arr[x][y][1] = arr[nx][ny][1];
+			arr[x][y][1] = arr[nx][ny][1];			
 			arr[nx][ny][0] = n;
 			arr[nx][ny][1] = (d + i) % 8;
 			
@@ -99,7 +110,8 @@ int solve(int sum, int x, int y, int graph[4][4][2]) {
 		
 	int ret_val = sum;
 	
-	graph[x][y][0] = -1;
+	int (*tmp_graph)[4][2];
+	//배열은 포인터로 넘길 수 밖에 없어서 문제 발생 reference by value가 안 됨.
 	
 	while(!q.empty()) {
 		nx = q.front().first;
@@ -107,12 +119,14 @@ int solve(int sum, int x, int y, int graph[4][4][2]) {
 		
 		q.pop();
 		
-		int tmp = solve(sum, nx, ny, graph);
+		tmp_graph = graph;
+		tmp_graph[x][y][0] = -1;
+		
+		int tmp = solve(sum, nx, ny, tmp_graph);
 		
 		ret_val = max(ret_val, tmp);
+		tmp_graph = graph;
 	}
-	
-	graph[x][y][0] = 0;
 	
 	return ret_val;
 }
