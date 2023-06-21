@@ -1,5 +1,6 @@
 #include <iostream>
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
@@ -16,27 +17,23 @@ struct Info {
 	{};
 };
 
-struct Graph {
-	int g[4][4];
-	
-	Info(int[][4] _g):
-		g(_g)
-	{};
-};
-
 struct Compare {
-	bool operator(const Info& a, const Info& b) {
+	bool operator()(const Info& a, const Info& b) {
 		return a.num > b.num;
 	}
 };
 
-void move_fish(int& arr[][4][2]) {
+void move_fish(int (*arr)[4][2]) {
 	priority_queue<Info, vector<Info>, Compare> pq;
 	
-	for(int i = 0; i < 4; ++i)
-		for(int j = 0; j < 4; ++j)
+	for(int i = 0; i < 4; ++i) {
+		for(int j = 0; j < 4; ++j) {
+			if(arr[i][j][0] <= 0)
+				continue;
+				
 			pq.push(Info(i, j, arr[i][j][0], arr[i][j][1]));
-	
+		}
+	}
 	
 	while(!pq.empty()) {
 		int x = pq.top().x;
@@ -47,8 +44,6 @@ void move_fish(int& arr[][4][2]) {
 		pq.pop();
 		
 		for(int i = 0; i < 8; ++i) {
-			
-			
 			int nx = x + dx[(d + i) % 8];
 			int ny = y + dy[(d + i) % 8];
 			
@@ -62,48 +57,64 @@ void move_fish(int& arr[][4][2]) {
 			arr[x][y][0] = arr[nx][ny][0];
 			arr[x][y][1] = arr[nx][ny][1];
 			arr[nx][ny][0] = n;
-			arr[nx][ny][1] = d;
+			arr[nx][ny][1] = (d + i) % 8;
 			
 			break;
 		}
-	}	
+	}
 }
 
-void solve(int graph[][4][2]) {
-	queue<Graph> q;
+int solve(int sum, int x, int y, int graph[4][4][2]) {
+	queue<pair<int, int>> q;
 	
-	graph[0][0][0] = 0;
+	sum += graph[x][y][0];
+	graph[x][y][0] = 0;
+	
 	move_fish(graph);
 	
-	int nx = 0;
-	int ny = 0;
+	cout << '\n';
+	for(int i = 0; i < 4; ++i) {
+		for(int j = 0; j < 4; ++j) {
+			cout << graph[i][j][0] << ' ' << graph[i][j][1] << '\t';
+		}
+		cout << '\n';
+	}
+	
+	int nx = x;
+	int ny = y;
+	int dir = graph[x][y][1];
+	
 	while(true) {
-		nx += dx[graph[0][0][1]];
-		ny += + dy[graph[0][0][1]];
+		nx += dx[dir];
+		ny += dy[dir];
 		
 		if(nx < 0 || ny < 0 || nx >= 4 || ny >= 4)
 			break;
-			
-		q.push(nx, ny);
+		
+		if(graph[nx][ny][0] == -1)
+			continue;
+		
+		q.push({nx, ny});
 	}
+		
+	int ret_val = sum;
 	
-	int dist[4][4];
-	fill(&dist[0][0], &dist[3][4], 17);
+	graph[x][y][0] = -1;
 	
 	while(!q.empty()) {
-		int x = q.front().first;
-		int y = q.front().second;
+		nx = q.front().first;
+		ny = q.front().second;
 		
 		q.pop();
 		
-		if(dist[x][y] < graph[x][y])
-			continue;
+		int tmp = solve(sum, nx, ny, graph);
 		
-		dist[x][y] = graph[x][y];
-		int temp[4][4][2] = graph;
-		temp[x][y]
+		ret_val = max(ret_val, tmp);
 	}
 	
+	graph[x][y][0] = 0;
+	
+	return ret_val;
 }
 
 int main() {
@@ -112,13 +123,15 @@ int main() {
 	
 	int arr[4][4][2];
 	
+	int dir;
 	for(int i = 0; i < 4; ++i) {
 		for(int j = 0; j < 4; ++j) {
-			cin >> arr[i][j][0] >> arr[i][j][1];
+			cin >> arr[i][j][0] >> dir;
+			arr[i][j][1] = dir - 1;
 		}
 	}
 	
-	
+	cout << solve(0, 0, 0, arr) << '\n';
 	
 	return 0;
 }
