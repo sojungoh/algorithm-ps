@@ -75,25 +75,28 @@ void move_fish(int (*arr)[4][2]) {
 	}
 }
 
-int solve(int sum, int x, int y, int graph[4][4][2]) {
+int solve(int sum, int x, int y, int (*graph)[4][2]) {
 	queue<pair<int, int>> q;
 	
-	sum += graph[x][y][0];
-	graph[x][y][0] = 0;
+	int tmp_graph[4][4][2];
+	copy(&graph[0][0][0], &graph[3][3][2], &tmp_graph[0][0][0]); 
 	
-	move_fish(graph);
+	sum += graph[x][y][0];
+	tmp_graph[x][y][0] = 0;
+	
+	move_fish(tmp_graph);
 	
 	cout << '\n';
 	for(int i = 0; i < 4; ++i) {
 		for(int j = 0; j < 4; ++j) {
-			cout << graph[i][j][0] << ' ' << graph[i][j][1] << '\t';
+			cout << tmp_graph[i][j][0] << ' ' << tmp_graph[i][j][1] << '\t';
 		}
 		cout << '\n';
 	}
 	
 	int nx = x;
 	int ny = y;
-	int dir = graph[x][y][1];
+	int dir = tmp_graph[x][y][1];
 	
 	while(true) {
 		nx += dx[dir];
@@ -102,16 +105,16 @@ int solve(int sum, int x, int y, int graph[4][4][2]) {
 		if(nx < 0 || ny < 0 || nx >= 4 || ny >= 4)
 			break;
 		
-		if(graph[nx][ny][0] == -1)
-			continue;
+		if(tmp_graph[nx][ny][0] == -1)
+			break;
 		
 		q.push({nx, ny});
 	}
 		
 	int ret_val = sum;
 	
-	int (*tmp_graph)[4][2];
-	//배열은 포인터로 넘길 수 밖에 없어서 문제 발생 reference by value가 안 됨.
+	//배열은 포인터로 넘길 수 밖에 없어서 문제 발생 call by value가 안 됨.
+	tmp_graph[x][y][0] = -1;
 	
 	while(!q.empty()) {
 		nx = q.front().first;
@@ -119,13 +122,9 @@ int solve(int sum, int x, int y, int graph[4][4][2]) {
 		
 		q.pop();
 		
-		tmp_graph = graph;
-		tmp_graph[x][y][0] = -1;
-		
 		int tmp = solve(sum, nx, ny, tmp_graph);
 		
 		ret_val = max(ret_val, tmp);
-		tmp_graph = graph;
 	}
 	
 	return ret_val;
