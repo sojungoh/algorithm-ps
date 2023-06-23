@@ -63,7 +63,9 @@ void move_fish(int (*arr)[4][2]) {
 			if(arr[nx][ny][0] == 0)
 				continue;
 			
-			pq.push(Info(x, y, arr[nx][ny][0], arr[nx][ny][1], count++));
+			// 빈 칸일 때 큐에 넣으면 안되는 조건 빼먹어서 헤맴
+			if(arr[nx][ny][0] != -1)
+				pq.push(Info(x, y, arr[nx][ny][0], arr[nx][ny][1], count++));
 			
 			arr[x][y][0] = arr[nx][ny][0];
 			arr[x][y][1] = arr[nx][ny][1];			
@@ -78,21 +80,11 @@ void move_fish(int (*arr)[4][2]) {
 int solve(int sum, int x, int y, int (*graph)[4][2]) {
 	queue<pair<int, int>> q;
 	
+	//배열은 포인터로 넘길 수 밖에 없어서 문제 발생 call by value가 안 돼서 따로 복사 배열 생성
 	int tmp_graph[4][4][2];
 	copy(&graph[0][0][0], &graph[3][3][2], &tmp_graph[0][0][0]); 
 	
-	sum += graph[x][y][0];
-	tmp_graph[x][y][0] = 0;
-	
 	move_fish(tmp_graph);
-	
-	cout << '\n';
-	for(int i = 0; i < 4; ++i) {
-		for(int j = 0; j < 4; ++j) {
-			cout << tmp_graph[i][j][0] << ' ' << tmp_graph[i][j][1] << '\t';
-		}
-		cout << '\n';
-	}
 	
 	int nx = x;
 	int ny = y;
@@ -106,14 +98,13 @@ int solve(int sum, int x, int y, int (*graph)[4][2]) {
 			break;
 		
 		if(tmp_graph[nx][ny][0] == -1)
-			break;
+			continue;
 		
 		q.push({nx, ny});
 	}
 		
 	int ret_val = sum;
 	
-	//배열은 포인터로 넘길 수 밖에 없어서 문제 발생 call by value가 안 됨.
 	tmp_graph[x][y][0] = -1;
 	
 	while(!q.empty()) {
@@ -122,7 +113,12 @@ int solve(int sum, int x, int y, int (*graph)[4][2]) {
 		
 		q.pop();
 		
-		int tmp = solve(sum, nx, ny, tmp_graph);
+		int f = tmp_graph[nx][ny][0];
+		tmp_graph[nx][ny][0] = 0;
+		
+		int tmp = solve(sum + f, nx, ny, tmp_graph);
+		
+		tmp_graph[nx][ny][0] = f;
 		
 		ret_val = max(ret_val, tmp);
 	}
@@ -144,7 +140,10 @@ int main() {
 		}
 	}
 	
-	cout << solve(0, 0, 0, arr) << '\n';
+	int sum = arr[0][0][0];
+	arr[0][0][0] = 0;
+	
+	cout << solve(sum, 0, 0, arr) << '\n';
 	
 	return 0;
 }
