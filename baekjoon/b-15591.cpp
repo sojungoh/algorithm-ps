@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <cmath>
 #include <algorithm>
 
 using namespace std;
@@ -15,26 +14,20 @@ int solve(int k, int v) {
 	
 	int *usado = new int[N + 1];
 	fill(usado, usado + N + 1, int(1e9) + 1);
-	usado[v] = 0;
 	
-	queue<pii> q;
-	
-	for(pii p : graph[v])
-		q.push({p.first, v});
+	queue<int> q;
+	q.push(v);
 	
 	while(!q.empty()) {
-		
-		int curr = q.front().first;
-		int prev = q.front().second;
+		int curr = q.front();
 		q.pop();
 		
-		usado[curr] = min(usado[prev], graph[prev][curr].second);
-		
 		for(pii p : graph[curr]) {
-			if(p.second >= usado[p.first])
+			if(p.first == v || usado[p.first] <= int(1e9))
 				continue;
 				
-			q.push({p.first, curr});
+			usado[p.first] = min(p.second, usado[curr]);
+			q.push(p.first);
 		}
 	}
 	
@@ -42,10 +35,9 @@ int solve(int k, int v) {
 	for(int i = 1; i <= N; ++i) {
 		if(i == v) continue;
 		
-		if(usado[i] <= int(1e9) && usado[i] >= k)
+		if(usado[i] >= k)
 			ret_val += 1;
 	}
-
 	
 	free(usado);
 	
@@ -53,8 +45,8 @@ int solve(int k, int v) {
 }
 
 int main() {
-	//ios::sync_with_stdio(0);
-	//cin.tie(0);
+	ios::sync_with_stdio(0);
+	cin.tie(0);
 	
 	cin >> N >> Q;
 	
