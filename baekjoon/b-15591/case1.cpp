@@ -11,7 +11,6 @@ int N, Q;
 vector<vector<pii>> graph(5001);
 
 int solve(int k, int v) {
-	
 	int *usado = new int[N + 1];
 	fill(usado, usado + N + 1, int(1e9) + 1);
 	
