@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
@@ -8,25 +9,12 @@ int R, C, N;
 int dx[4] = {-1, 0, 1, 0}, dy[4] = {0, -1, 0, 1};
 char **cave;
 
-void throw_arrow(int r, bool from_right) {
-    int i = (from_right) ? C - 1 : 0;
-    int j = (from_right) ? -1 : 1;
+bool flag = false;
+void dfs(set<pair<int, int>>& coord, vector<vector<bool>>& visited, int x, int y) {
+    if(x == R - 1)
+        flag = true;
 
-    while(0 <= i && i < C) {
-        if(cave[r][i] == 'x') {
-            cave[r][i] = '.';
-            break;
-        }
-        i += j;
-    }
-}
-
-int bottom_idx = 0;
-void dfs(priority_queue<pair<int, int>>& pq, vector<vector<bool>>& visited, int x, int y) {
-    if(bottom_idx < x)
-        bottom_idx = x;
-
-    pq.push({x, y});
+    coord.insert({x, y});
 
     for(int i = 0; i < 4; ++i) {
         int nx = x + dx[i];
@@ -35,11 +23,11 @@ void dfs(priority_queue<pair<int, int>>& pq, vector<vector<bool>>& visited, int 
         if(nx < 0 || ny < 0 || nx >= R || ny >= C)
             continue;
         
-        if(visited[nx][ny] || cave[x][y] == '.')
+        if(visited[nx][ny] || cave[nx][ny] == '.')
             continue;
-        
+
         visited[nx][ny] = 1;
-        dfs(pq, visited, nx, ny);
+        dfs(coord, visited, nx, ny);
     }
 }
 
@@ -52,35 +40,88 @@ int main() {
     for(int i = 0; i < R; ++i)
         cave[i] = new char[C];
 
-    for(int i = 0; i < R; ++i)
-        for(int j = 0; j < C; ++j)
+    vector<set<int>> row(R);
+    vector<set<int>> col(C);
+
+    for(int i = 0; i < R; ++i) {
+        for(int j = 0; j < C; ++j) {
             cin >> cave[i][j];
+            if(cave[i][j] == 'x') {
+                row[i].insert(j);
+                col[j].insert(i);         
+            }
+        }
+    }
     
     cin >> N;
     for(int k = 0; k < N; ++k) {
         int q;
         cin >> q;
+        q = R - q;
 
-        throw_arrow(q, k % 2);
+        if(row[q].empty())
+            continue;
 
-        vector<vector<bool>> visited(R, vector<bool>(C, 0));
+        auto dst = (k % 2) ? --row[q].end() : row[q].begin();
+        cave[q][*dst] = '.';
+        col[*dst].erase(q);
+        row[q].erase(dst);
+
+        vector<vector<bool>> visited(R, vector<bool>(C, false));
         for(int i = 0; i < R; ++i) {
             for(int j = 0; j < C; ++j) {
                 if(visited[i][j] || cave[i][j] == '.')
                     continue;
                 
-                priority_queue<pair<int, int>> pq;
+                set<pair<int, int>> coord;
                 visited[i][j] = true;
-                dfs(pq, visited, i, j);
+                dfs(coord, visited, i, j);
 
-                if(bottom_idx != R - 1) {
-                    // ????
+                if(flag) {
+                    flag = false;
+                    continue;
                 }
 
-                
+                int diff = R;
+                for(auto iter = coord.rbegin(); iter != coord.rend(); ++iter) {
+                    int x = iter->first;
+                    int y = iter->second;
+
+                    auto tmp = col[y].find(x);
+                    
+                    int t = R;
+                    if(++tmp != col[y].end()) {
+                        if(coord.find({*tmp, y}) != coord.end())
+                            continue;
+                        t = *tmp;
+                    }
+                    
+                    diff = min(diff, t - x - 1);
+                }
+
+                for(auto p : coord) {
+                    cave[p.first][p.second] = '.';
+                    row[p.first].erase(p.second);
+                    col[p.second].erase(p.first);
+                }
+
+                for(auto p : coord) {
+                    cave[p.first + diff][p.second] = 'x';
+                    row[p.first + diff].insert(p.second);
+                    col[p.second].insert(p.first + diff);
+                    visited[p.first + diff][p.second] = true;
+                } 
             }
         }
     }
+
+    for(int i = 0; i < R; ++i) {
+        for(int j = 0; j < C; ++j) {
+            cout << cave[i][j];
+        }
+        cout << '\n';
+    }
+    cout << '\n';
 
     for(int i = 0; i < R; ++i)
         delete cave[i];
