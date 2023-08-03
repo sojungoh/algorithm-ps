@@ -30,25 +30,23 @@ int main() {
         cows.insert({r, c});
     }
     
-    int answer = N * (N - 1) / 2;
-    auto iter = cows.begin();
+    int answer = K * (K - 1) / 2;
     int visited[101][101] = {0, };
-    for(int i = 0; i < K; ++i, ++iter) {
-        if(visited[iter->first][iter->second] < 0);
+    int count = 1;
+    for(auto c : cows) {
+        if(visited[c.first][c.second] < 0)
             continue;
-        
+
+        visited[c.first][c.second] = -1;
+        bool flag = false;
         queue<pair<int, int>> q;
-        q.push(*iter);
-        int count = 1;
+        q.push(c);
 
         while(!q.empty()) {
             int x = q.front().first;
             int y = q.front().second;
             q.pop();
-
-            if(visited[x][y] == 0)
-                visited[x][y] = 1;
-
+            
             for(int d = 0; d < 4; ++d) {
                 int nx = x + dx[d];
                 int ny = y + dy[d];
@@ -56,27 +54,31 @@ int main() {
                 if(nx < 1 || ny < 1 || nx > N || ny > N)
                     continue;
                 
-                if(visited[x][y] != 0)
+                if(visited[nx][ny] != 0)
                     continue;
                 
                 if(road[x][y].find({nx, ny}) != road[x][y].end())
                     continue;
                 
                 if(cows.find({nx, ny}) != cows.end()) {
+                    flag = true;
                     count++;
                     visited[nx][ny] = -1;
                 }
-
+                else
+                    visited[nx][ny] = 1;
+                
                 q.push({nx, ny}); 
             }
+        }
 
+        if(flag)
             answer -= count * (count - 1) / 2;
 
-            for(int i = 1; i <= N; ++i)
-                for(int j = 1; j <= N; ++j)
-                    if(visited[i][j] > 0) 
-                        visited[i][j] = 0;
-        }
+        for(int i = 1; i <= N; ++i)
+            for(int j = 1; j <= N; ++j)
+                if(visited[i][j] > 0) 
+                    visited[i][j] = 0;
     }
 
     cout << answer << '\n';
