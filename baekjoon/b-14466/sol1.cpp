@@ -32,13 +32,14 @@ int main() {
     
     int answer = K * (K - 1) / 2;
     int visited[101][101] = {0, };
-    int count = 1;
     for(auto c : cows) {
         if(visited[c.first][c.second] < 0)
             continue;
 
         visited[c.first][c.second] = -1;
+        
         bool flag = false;
+        int count = 1;
         queue<pair<int, int>> q;
         q.push(c);
 
