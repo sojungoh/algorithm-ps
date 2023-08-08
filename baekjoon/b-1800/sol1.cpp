@@ -1,65 +1,51 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <set>
-#include <tuple>
 #include <algorithm>
 
 using namespace std;
 
 int N, P, K;
 
-struct Info {
-    int cost;
-    int count;
-    int idx;
-
-    Info(int cost, int count, int idx): cost(cost), count(count), idx(idx) {}
-
-    bool operator < (const Info& y) const {
-        if(cost == y.cost)
-            return count > y.count;
-        return cost > y.cost;
-    } 
-};
-
 void solve(vector<vector<pair<int, int>>>& cables) {
     int answer = -1;
-    set<tuple<int, int, int>> check;
-    priority_queue<Info> pq;
+    vector<vector<int>> dst(N + 1, vector<int>(K + 1));
+
+    for(int i = 1; i <= N; ++i)
+        fill(dst[i].begin(), dst[i].end(), int(1e7));
     
-    pq.push(Info(0, 0, 1));
-    check.insert({0, 0, 1});
+    for(int i = 0; i <= K; ++i) {
+        dst[1][i] = 0;
+    }
 
-    while(!pq.empty()) {
-        int cost = pq.top().cost;
-        int count = pq.top().count;
-        int x = pq.top().idx;
-        pq.pop();
+    queue<int> q;
+    q.push(1);
 
-        cout << cost << ' ' << count << ' ' << x << '\n';
+    while(!q.empty()) {
+        int curr = q.front();
+        q.pop();
 
-        if(x == N) {
-            answer = cost;
-            break;
-        }
+        for(auto p : cables[curr]) {
+            int next = p.first;
+            int cost = p.second;
+            bool push_flag = false;
 
-        for(auto p : cables[x]) {
-            if(count < K) {
-                if(cost < p.second) {
-                    if(check.find({cost, count + 1, p.first}) != check.end())
-                        continue;
-                    check.insert({cost, count + 1, p.first});
-                    pq.push(Info(cost, count + 1, p.first));
-                }
+            // k = 0 일 때와 아닐 때
+            for(int i = 0; i <= K; ++i) {
+                int cmp = (i == 0) ? max(dst[curr][i], cost) : min(dst[curr][i - 1], cost);
+                if(dst[next][i] <= cmp)
+                    continue;
+                dst[next][i] = cmp;
+                push_flag = true;
             }
-            int tmp = max(cost, p.second);
-            if(check.find({tmp, count, p.first}) != check.end())
-                continue;
-            check.insert({tmp, count, p.first});
-            pq.push(Info(tmp, count, p.first));
+
+            if(push_flag)
+                q.push(next);
         }
     }
+
+    if(dst[N][K] < int(1e7))
+        answer = dst[N][K];
 
     cout << answer << '\n';
 }
