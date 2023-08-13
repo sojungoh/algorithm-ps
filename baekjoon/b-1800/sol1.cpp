@@ -6,9 +6,8 @@
 using namespace std;
 
 int N, P, K;
-vector<vector<pair<int, int>>> cables;
 
-bool dijkstra(int x) {
+bool dijkstra(vector<vector<pair<int, int>>>& cables, int x) {
     vector<int> dist(N + 1);
     fill(dist.begin(), dist.end(), N + 1);
     
@@ -23,6 +22,9 @@ bool dijkstra(int x) {
         if(dist[curr] <= cost)
             continue;
         dist[curr] = cost;
+
+        if(curr == N)
+            break;
         
         for(auto p : cables[curr]) {
             int cmp = cost + (p.second > x);
@@ -41,8 +43,7 @@ int main() {
 
     cin >> N >> P >> K;
     
-    cables.resize(N + 1);
-
+    vector<vector<pair<int, int>>> cables(N + 1);
     vector<int> cost;
     for(int i = 0; i < P; ++i) {
         int a, b, c;
@@ -60,7 +61,7 @@ int main() {
     while(l <= r) {
         int mid = (l + r) / 2;
         
-        if(dijkstra(cost[mid])) {
+        if(dijkstra(cables, cost[mid])) {
             if(mid == 0) {
                 answer = 0;
                 break;
