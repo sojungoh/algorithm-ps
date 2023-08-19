@@ -50,7 +50,7 @@ void reverse_piece(vector<Piece_info>& chess, int idx) {
         chess[idx].down_idx = u;
         idx = u;
     }
-    chess[idx].up_idx = chess[idx].down_idx;
+    chess[idx].up_idx = (first_flag) ? -1 : chess[idx].down_idx;
     chess[idx].down_idx = tmp;
 }
 
@@ -93,11 +93,12 @@ int main() {
 
         for(int i = 0; i < K; ++i) {  
             Piece_info p = chess[i];
-            int nx = p.x + dx[p.dir];
+            int nx = p.x + dx[p.dir]; 
             int ny = p.y + dy[p.dir];
 
             if(nx < 1 || ny < 1 || nx > N || ny > N || board[nx][ny].color == BLUE) {
                 p.dir = (p.dir < 2) ? 1 - p.dir : 5 - p.dir;
+                chess[i].dir = p.dir;
                 nx = p.x + dx[p.dir];
                 ny = p.y + dy[p.dir];
             }
@@ -123,19 +124,21 @@ int main() {
                 board[p.x][p.y].top_idx = i;
             }
 
-            board[nx][ny].top_idx = board[p.x][p.y].top_idx;
-
+            int curr_top = board[p.x][p.y].top_idx;
             if(board[p.x][p.y].bottom_idx == reversed_idx)
                 board[p.x][p.y].bottom_idx = -1;
+            else
+                chess[chess[reversed_idx].down_idx].up_idx = -1;
             board[p.x][p.y].top_idx = chess[reversed_idx].down_idx;
 
             if(board[nx][ny].bottom_idx == -1)
                 board[nx][ny].bottom_idx = reversed_idx;
-            else {
-                chess[reversed_idx].down_idx = board[nx][ny].top_idx;
+            else
                 chess[board[nx][ny].top_idx].up_idx = reversed_idx;
-            }
 
+            chess[reversed_idx].down_idx = board[nx][ny].top_idx;
+
+            board[nx][ny].top_idx = curr_top;
             move_piece(chess, nx, ny, reversed_idx);
         }
 
@@ -147,6 +150,7 @@ int main() {
         turn = -1;
 
     std::cout << turn << '\n';
+
 
     return 0;
 }
