@@ -42,11 +42,10 @@ bool fall_by_gravity(vector<vector<pii>>& grid, int& x, int& y, int d) {
 }
 
 int solve(vector<vector<pii>>& grid) {
-    int answer = -1;
     priority_queue<Info> pq;
 
     if(!fall_by_gravity(grid, C[0], C[1], 2))
-        return answer;
+        return -1;
    
     pq.push(Info(0, C[0], C[1], 2));
 
@@ -69,21 +68,18 @@ int solve(vector<vector<pii>>& grid) {
             grid[x][y].second = flip_count;
         }
 
-        // for(int i = 1; i <= N; ++i) {
-        //     for(int j = 1; j <= M; ++j) {
-        //         cout << grid[i][j].first << ' ' << grid[i][j].second << '\t';
-        //     }
-        //     cout << '\n';
-        // }
-        // cout << '\n';
-
         if(x == D[0] && y == D[1]) {
             return flip_count;
         }
 
         int nx = x;
         int ny = y;
+
         if(fall_by_gravity(grid, nx, ny, 2 - d)) {
+            if(nx == D[0] && ny == D[1]) {
+                return flip_count + 1;
+            }
+
             int pi = (d == 0) ? grid[nx][ny].second : grid[nx][ny].first;
             if(pi > flip_count + 1)
                 pq.push(Info(flip_count + 1, nx, ny, 2 - d));
@@ -99,8 +95,7 @@ int solve(vector<vector<pii>>& grid) {
                 continue;
 
             if(nx == D[0] && ny == D[1]) {
-                answer = flip_count;
-                return answer;
+                return flip_count;
             }
 
             if(!fall_by_gravity(grid, nx, ny, d))
@@ -114,7 +109,7 @@ int solve(vector<vector<pii>>& grid) {
         }
     }
 
-    return answer;
+    return -1;
 }
 
 int main() {
